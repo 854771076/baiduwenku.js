@@ -36,11 +36,12 @@
     }
     var parser=(json,type)=>{
         let page=0
+        var maxpage
         if(type!='ppt'){
-            var maxpage=json.json.length
+            maxpage=json.json.length
         }
         else{
-            var  maxpage=json.length
+            maxpage=json.length
         }
         let div=document.querySelector('#app')
         let newchild=document.createElement('div')
@@ -141,7 +142,7 @@
 
             })
         }
-        else if(type=='word'){
+        else if(type=='word' || type=='pdf'){
             $.ajax({
                 type: "GET",
                 url: json.json[page].pageLoadUrl,
@@ -188,9 +189,24 @@
 
         return innerHTML
     }
+    var VIP=()=>{
+        let data
+        Object.defineProperty(window,'pageData',{
+            set(newObj){
+                data=newObj
+            },
+            get(){
+                if('vipInfo' in data){
+                    data.vipInfo.isVip=1
+                }
+                console.log('vip')
+                return data
+            }
+        })
+    }
     var main=()=>{
         addDownloader()
-
+        VIP()
     }
     main()
 })();
