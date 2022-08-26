@@ -16,7 +16,7 @@
         let div=document.querySelector('#app')
         let newchild=document.createElement('div')
         newchild.setAttribute('class','Download')
-        newchild.setAttribute('style','position:absolute;top:100px;color:black;width:80px;height:40px;line-height:40px;text-align: center;background-color:#d3d3d3;z-index:200;cursor: pointer;')
+        newchild.setAttribute('style','position:absolute;top:100px;color:black;width:80px;height:40px;line-height:40px;text-align: center;background-color:#d3d3d3;z-index:200;cursor: pointer;box-shadow: 0 0 22px 0 rgba(0,7,24,.08);')
         newchild.innerHTML='解析文档'
         newchild.addEventListener('mouseover',function(){
         newchild.style.backgroundColor='orange'
@@ -46,8 +46,9 @@
         let div=document.querySelector('#app')
         let newchild=document.createElement('div')
         newchild.setAttribute('class','Parser')
-        newchild.setAttribute('style','position:absolute;top:10%;left:10%;color:black;width:80%;height:80vh;background-color:#f1f1f1;z-index:2000;border-radius: 10px;')
-        newchild.innerHTML='<div id="close" style="position:absolute;top:0px;right:0px;width: 25px;height:25px;border-radius: 25px;background-color: white;line-height:25px;text-align:center">x</div><a id="prepage" href="javascript:;" style="position:absolute;background-color:rgba(0,0,0,0.3);width:45px;height:150px;top:calc(50% - 75px);line-height:150px;color:white;text-align: center;text-decoration: none;"><</a><a id="nextpage" href="javascript:;" style="position:absolute;background-color:rgba(0,0,0,0.3);width:45px;height:150px;top:calc(50% - 75px);left:calc(100% - 45px);line-height:150px;color:white;text-align: center;text-decoration: none;">></a>'
+        newchild.setAttribute('style','position:absolute;top:10%;left:10%;color:black;width:80%;height:80vh;background-color:#f7f7f7;z-index:2000;border-radius: 10px;font-size:15px;line-height:40px;box-shadow: 0 0 22px 0 rgba(0,7,24,.08);')
+        let c='<div id="close" style="position:absolute;top:0px;right:0px;width: 25px;height:25px;border-radius: 25px;background-color: white;line-height:25px;text-align:center">x</div><a id="prepage" href="javascript:;" style="position:absolute;background-color:rgba(0,0,0,0.3);width:45px;height:150px;top:calc(50% - 75px);line-height:150px;color:white;text-align: center;text-decoration: none;"><</a><a id="nextpage" href="javascript:;" style="position:absolute;background-color:rgba(0,0,0,0.3);width:45px;height:150px;top:calc(50% - 75px);left:calc(100% - 45px);line-height:150px;color:white;text-align: center;text-decoration: none;">></a>'
+        newchild.innerHTML=c
         let as=newchild.querySelectorAll('a')
         //初始化
 
@@ -85,16 +86,18 @@
         let close=newchild.querySelector('#close')
         close.addEventListener('mouseover',function(){
             this.style.backgroundColor='#e81123'
+            this.style.cursor='pointer'
         })
         close.addEventListener('mouseleave',function(){
             this.style.backgroundColor='white'
+            this.style.cursor='pointer'
         })
         close.addEventListener('click',function(){
+            page=0
             document.querySelector('.Parser').style.display='none'
 
         })
         if (!document.querySelector('#content')){
-
             newchild.appendChild(content)
             div.appendChild(newchild)
 
@@ -105,7 +108,7 @@
     }
 
     var getinner=(json,page,type)=>{
-        var innerHTML=''
+        var innerHTML='<div style="position:absolute;bottom:0px;right:50%;z-index=200">'+(page+1)+'</div>'
         if(type=='excel'){
             $.ajax({
                 type: "GET",
@@ -180,7 +183,7 @@
 
         }else if(type=='ppt'){
             let url=json[page]
-            let innerHTML='<img src="'+url+'" style="width: 100%;height:100%;">'
+            innerHTML+='<img src="'+url+'" style="width: 100%;height:98%;">'
             document.querySelector('#content').innerHTML=innerHTML
 
         }else{
@@ -189,10 +192,10 @@
 
         return innerHTML
     }
-    
+
     var main=()=>{
         addDownloader()
-        
+
     }
     main()
 })();
