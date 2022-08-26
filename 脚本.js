@@ -189,24 +189,10 @@
 
         return innerHTML
     }
-    var VIP=()=>{
-        let data
-        Object.defineProperty(window,'pageData',{
-            set(newObj){
-                data=newObj
-            },
-            get(){
-                if('vipInfo' in data){
-                    data.vipInfo.isVip=1
-                }
-                console.log('vip')
-                return data
-            }
-        })
-    }
+    
     var main=()=>{
         addDownloader()
-        VIP()
+        
     }
     main()
 })();
