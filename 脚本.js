@@ -3,10 +3,10 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  try to take over the world!
-// @author       You
+// @author       fiang
 // @match        https://wenku.baidu.com/view/*
 // @match        https://wenku.baidu.com/view/*.html
-// @icon         data:image/ico https://edu-wenku.bdimg.com/v1/pc/2020%E6%96%B0%E9%A6%96%E9%A1%B5/wenku-header-icon.ico
+// @icon         https://edu-wenku.bdimg.com/v1/pc/2020%E6%96%B0%E9%A6%96%E9%A1%B5/wenku-header-icon.ico
 // @grant        none
 // ==/UserScript==
 
