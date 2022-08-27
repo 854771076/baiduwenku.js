@@ -4,8 +4,15 @@
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
-// @match        https://wenku.baidu.com/view/*
-// @match        https://wenku.baidu.com/view/*.html
+// @require           https://cdn.bootcss.com/jquery/3.5.1/jquery.min.js
+// @require           https://cdn.staticfile.org/jspdf/2.5.1/jspdf.umd.min.js
+// @require           https://cdn.staticfile.org/html2canvas/1.4.1/html2canvas.min.js
+// @match             *://wenku.baidu.com/view/*
+// @match             *://wenku.baidu.com/tfview/*
+// @match             *://wenku.baidu.com/link?url*
+// @match             *://wenku.baidu.com/share/*
+// @match             *://www.doc88.com/p-*
+// @match             *://www.docin.com/p-*
 // @icon         https://edu-wenku.bdimg.com/v1/pc/2020%E6%96%B0%E9%A6%96%E9%A1%B5/wenku-header-icon.ico
 // @grant        none
 // ==/UserScript==
@@ -176,5 +183,79 @@
 
         return innerHTML
     }
+    const host = location.host;
+    const InterfaceList = [
+        {"host":"wkdownload","url":"http://www.html22.com/d/?url="},
+        {"host":"wenku.baidu.com","func":"bdwk()","el":"bdwk_ele"},
+        {"host":"www.doc88.com","func":"doc()","el":"doc_ele"},
+        {"host":"www.docin.com","func":"docin()","el":"docin_ele"}
+    ]
+    var replica = () => {
+        /**
+         * 灵感来源于https://greasyfork.org/zh-CN/scripts/445128
+         */
+        try {
+            var text = $('div.link')[0].outerText.split("”的文档")[0].split("查看全部包含“")[1];
+        } catch (error) {
+            console.log(error.stack);
+            text = "出错啦，请通知作者修复";
+        }
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+        } else {
+            const textarea = document.createElement('textarea');
+            document.body.appendChild(textarea);
+            textarea.style.position = 'fixed';
+            textarea.style.clip = 'rect(0 0 0 0)';
+            textarea.style.top = '10px';
+            textarea.value = text;
+            textarea.select();
+            document.execCommand('copy', true);
+            document.body.removeChild(textarea);
+        }
+    }
+    var copy=()=>{
+        let oldtext = "";
+        let count = 0;
+        if(host == InterfaceList[1].host){
+            $(document).unbind('keydown').bind('keydown', e => {
+                if(e.ctrlKey && e.keyCode  == 67) {
+                    replica();
+                    $('.dialog-mask').remove();
+                    $('.copy-limit-dialog-v2').remove();
+                    $(".btn-success").text("复制成功").fadeOut(1000);
+                    e.preventDefault();
+                    count+=1;
+                    //return false;
+                }
+            })
+
+            document.onmouseup = ev => {
+                $(".btn-success").remove();
+                var nowtext = $('div.link')[0].outerText.split("”的文档")[0].split("查看全部包含“")[1];
+                if(nowtext != oldtext){
+                    const oEvent=ev||event;
+                    const elbtn=$(`<div class="btn-success" style="left:${oEvent.clientX+15+'px'}; top: ${oEvent.clientY-10+'px'};">复制</div>`);
+                    $("body").append(elbtn);
+                    oldtext = nowtext;
+                    $("#reader-helper").hide();
+                }
+
+                $(".btn-success").on("click", e => {
+                    replica();
+                    count+=1;
+                    console.info(`第${count}次为您复制,内容为：${nowtext}`);
+                    //$(".btn-success").fadeOut(1000);
+                }).on("mouseup", e => {
+                    $(".btn-success").text("复制成功");
+                    $(".btn-success").fadeOut(1000);
+                    e.stopPropagation();
+                    e.preventDefault();
+                })
+            }
+        }
+    }
     Downloader()
+    copy()
 })();
