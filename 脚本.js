@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  try to take over the world!
-// @author       fiang
+// @author       You
 // @match        https://wenku.baidu.com/view/*
 // @match        https://wenku.baidu.com/view/*.html
 // @icon         https://edu-wenku.bdimg.com/v1/pc/2020%E6%96%B0%E9%A6%96%E9%A1%B5/wenku-header-icon.ico
@@ -12,12 +12,14 @@
 
 (function() {
 
-    var addDownloader=()=>{
+    var Downloader=()=>{
         let div=document.querySelector('#app')
+        //添加解析文档按钮
         let newchild=document.createElement('div')
         newchild.setAttribute('class','Download')
         newchild.setAttribute('style','position:absolute;top:100px;color:black;width:80px;height:40px;line-height:40px;text-align: center;background-color:#d3d3d3;z-index:200;cursor: pointer;box-shadow: 0 0 22px 0 rgba(0,7,24,.08);')
         newchild.innerHTML='解析文档'
+        //按钮事件
         newchild.addEventListener('mouseover',function(){
         newchild.style.backgroundColor='orange'
         newchild.style.color='white'
@@ -27,13 +29,13 @@
         newchild.style.color='black'
         })
         newchild.addEventListener('click',function(){
-            //注释
             console.log(pageData.readerInfo.htmlUrls)
             parser(pageData.readerInfo.htmlUrls,pageData.viewBiz.docInfo.fileType)
         })
+        //插入按钮
         div.appendChild(newchild)
-        console.log(div)
     }
+    //解析json函数
     var parser=(json,type)=>{
         let page=0
         var maxpage
@@ -44,18 +46,18 @@
             maxpage=json.length
         }
         let div=document.querySelector('#app')
+        //添加解析器元素
         let newchild=document.createElement('div')
         newchild.setAttribute('class','Parser')
         newchild.setAttribute('style','position:absolute;top:10%;left:10%;color:black;width:80%;height:80vh;background-color:#f7f7f7;z-index:2000;border-radius: 10px;font-size:15px;line-height:40px;box-shadow: 0 0 22px 0 rgba(0,7,24,.08);')
         let c='<div id="close" style="position:absolute;top:0px;right:0px;width: 25px;height:25px;border-radius: 25px;background-color: white;line-height:25px;text-align:center">x</div><a id="prepage" href="javascript:;" style="position:absolute;background-color:rgba(0,0,0,0.3);width:45px;height:150px;top:calc(50% - 75px);line-height:150px;color:white;text-align: center;text-decoration: none;"><</a><a id="nextpage" href="javascript:;" style="position:absolute;background-color:rgba(0,0,0,0.3);width:45px;height:150px;top:calc(50% - 75px);left:calc(100% - 45px);line-height:150px;color:white;text-align: center;text-decoration: none;">></a>'
         newchild.innerHTML=c
         let as=newchild.querySelectorAll('a')
-        //初始化
-
+        //添加内容元素
         let content=document.createElement('div')
         content.setAttribute('id','content')
         content.setAttribute('style','width:99%;height:100%;padding:30px 100px;overflow: auto;box-sizing: border-box;')
-        //初始化翻页条
+        //初始化翻页条事件
         for(let i=0;i<as.length;i++){
         as[i].addEventListener('mouseover',function(){
         this.style.backgroundColor='rgba(0,0,0,0.6)'
@@ -83,6 +85,7 @@
             console.log('下一页')
 
         })
+        //关闭按钮事件
         let close=newchild.querySelector('#close')
         close.addEventListener('mouseover',function(){
             this.style.backgroundColor='#e81123'
@@ -94,58 +97,26 @@
         })
         close.addEventListener('click',function(){
             page=0
-            document.querySelector('.Parser').style.display='none'
+            var p=document.querySelector('.Parser')
+            div.removeChild(p)
 
         })
-        if (!document.querySelector('#content')){
+        if (!document.querySelector('.Parser')){
             newchild.appendChild(content)
             div.appendChild(newchild)
-
-
         }
-        document.querySelector('.Parser').style.display='block'
         getinner(json,page,type)
     }
 
     var getinner=(json,page,type)=>{
-        var innerHTML='<div style="position:absolute;bottom:0px;right:50%;z-index=200">'+(page+1)+'</div>'
-        if(type=='excel'){
-            $.ajax({
-                type: "GET",
-                url: json.json[page].pageLoadUrl,
-                contentType: 'application/Javascript',
-                dataType: "jsonp",
-                jsonp: "callback",
-                jsonpCallback:"wenku_"+(page+1),
-                crossDomain: true,
-                headers: {'Access-Control-Allow-Origin':'*'},
-                timeout: 1000,
-                success: function (result) {
-                    console.log(result)
-                    let flag=0
-                    for(var i=0;i<result.body.length;i++){
-                        if(result.body[i].c==' '||result.body[i].c instanceof Object){
-                            if(!flag){
-                            innerHTML+='<br>'
-                                flag=1
-                            }
-
-                        }else{
-                            innerHTML+=String(result.body[i].c)
-                            flag=0
-                        }
-
-                    }
-                    document.querySelector('#content').innerHTML=innerHTML
-                },
-                error: function (result) {
-                    console.error("error");
-                    console.error(result);
-                }
-
-            })
+        var imglist=json.png
+        if (page==0){
+            var imgindex=0
+            var imgflag=0
         }
-        else if(type=='word' || type=='pdf'){
+        //显示页码
+        var innerHTML='<div style="position:absolute;bottom:0px;right:50%;z-index=200">'+(page+1)+'</div>'
+        if(type=='word' || type=='pdf'||type=='txt'||type=='excel'){
             $.ajax({
                 type: "GET",
                 url: json.json[page].pageLoadUrl,
@@ -160,13 +131,26 @@
                     console.log(result)
                     let flag=0
                     for(var i=0;i<result.body.length;i++){
-                        if(result.body[i].c==' '||result.body[i].c instanceof Object){
+                        if(result.body[i].c==' '){
                             if(!flag){
-                            innerHTML+='<br>'
+                                innerHTML+='<br>'
                                 flag=1
                             }
 
-                        }else{
+                        }else if(result.body[i].c instanceof Object ){
+                            console.log(imglist)
+                            console.log(imgindex)
+                            if(imgindex<imglist.length-1 && imgflag==0){
+                                innerHTML+='<br><img src="'+imglist[imgindex].pageLoadUrl+'"style="width:50%;margin:0 auto;display:block"></img><br>'
+                                imgindex++
+
+                            }
+                            if(imgindex==imglist.length-1){
+                            imgflag=1
+                            }
+
+                        }
+                        else{
                             innerHTML+=String(result.body[i].c)
                             flag=0
                         }
@@ -192,10 +176,5 @@
 
         return innerHTML
     }
-
-    var main=()=>{
-        addDownloader()
-
-    }
-    main()
+    Downloader()
 })();
